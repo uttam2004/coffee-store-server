@@ -9,8 +9,9 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-const uri = `mongodb://${process.env.DB_USER}:${process.env.DB_PASS}@ac-muizyz5-shard-00-00.njpvmhe.mongodb.net:27017,ac-muizyz5-shard-00-01.njpvmhe.mongodb.net:27017,ac-muizyz5-shard-00-02.njpvmhe.mongodb.net:27017/?ssl=true&replicaSet=atlas-9o5c0p-shard-0&authSource=admin&appName=Cluster0`;
-// console.log(uri);
+
+// const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.njpvmhe.mongodb.net/?appName=Cluster0`;
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.njpvmhe.mongodb.net/?appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -27,7 +28,7 @@ async function run() {
         await client.connect();
 
         const coffeesCollection = client.db('coffeeDB').collection('coffees');
-        const usersCollection= client.db('coffeeDB').collection('users');
+        const usersCollection = client.db('coffeeDB').collection('users');
 
         app.get('/coffees', async (req, res) => {
             // const cursor = coffeesCollection.find();
@@ -81,34 +82,34 @@ async function run() {
 
 
         // user related APIs
-        app.get('/users', async(req, res)=>{
-            const result= await usersCollection.find().toArray();
+        app.get('/users', async (req, res) => {
+            const result = await usersCollection.find().toArray();
             res.send(result);
         })
 
-        app.post('/users', async(req, res)=>{
-            const userProfile= req.body;
-            const result= await usersCollection.insertOne(userProfile);
+        app.post('/users', async (req, res) => {
+            const userProfile = req.body;
+            const result = await usersCollection.insertOne(userProfile);
             res.send(result);
         })
 
-        app.patch('/users', async(req, res)=>{
-            const {email, lastSignInTime}= req.body;
-            const filter= {email: email}
-            const updatedDoc={
-                $set:{
+        app.patch('/users', async (req, res) => {
+            const { email, lastSignInTime } = req.body;
+            const filter = { email: email }
+            const updatedDoc = {
+                $set: {
                     lastSignInTime: lastSignInTime
                 }
             }
 
-            const result= await usersCollection.updateOne(filter, updatedDoc);
+            const result = await usersCollection.updateOne(filter, updatedDoc);
             res.send(result);
         })
 
-        app.delete('/users/:id', async(req, res)=>{
-            const id= req.params.id;
-            const query= {_id: new ObjectId(id)};
-            const result= await usersCollection.deleteOne(query);
+        app.delete('/users/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await usersCollection.deleteOne(query);
             res.send(result);
         })
 
@@ -132,3 +133,5 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
     console.log(`Coffee server is running on port ${port}`)
 })
+
+module.exports = app;
